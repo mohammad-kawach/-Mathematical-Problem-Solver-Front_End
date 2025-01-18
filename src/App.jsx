@@ -7,28 +7,50 @@ import { Header } from "./components/Header";
 import SubmitButton from "./components/SubmitButton";
 import { SolutionSteps } from "./components/SolutionSteps";
 import { MathGraph } from "./components/MathGraph";
+import QuickActions from "./components/QuickActions";
+// import StatisticsDisplay from "./components/StatisticsDisplay";
+// import MatrixDisplay from "./components/MatrixDisplay";
 
 function App() {
   const { messages, addMessage } = useChatStore();
   const [userInput, setUserInput] = useState("");
+  // const [operationType, setOperationType] = useState("general"); // New state for operation type
   const chatBoxRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
+  // Add helper function to detect operation type
+  const detectOperationType = (input) => {
+    const input_lower = input.toLowerCase();
+    if (input_lower.includes("integrate")) return "integration";
+    if (
+      input_lower.includes("derivative") ||
+      input_lower.includes("differentiate")
+    )
+      return "differentiation";
+    if (input_lower.includes("matrix")) return "matrix";
+    if (input_lower.includes("statistics")) return "statistics";
+    return "general";
+  };
+
   const sendMessage = async (e) => {
-    e?.preventDefault(); // Handle both button click and form submit
+    e?.preventDefault();
     if (!userInput.trim()) return;
+
+    // Detect operation type from input
+    const detectedType = detectOperationType(userInput);
+    // setOperationType(detectedType);
 
     addMessage({ sender: "user", text: userInput });
 
     try {
       const response = await axios.post("http://localhost:5000/chat", {
         message: userInput,
+        type: detectedType, // Send operation type to backend
       });
 
       const botMessage = {
@@ -36,6 +58,9 @@ function App() {
         text: response.data.response,
         steps: response.data.steps,
         graph: response.data.graph,
+        operationType: detectedType,
+        matrixData: response.data.matrix,
+        statisticsData: response.data.statistics,
       };
 
       addMessage(botMessage);
@@ -50,6 +75,8 @@ function App() {
     setUserInput("");
   };
 
+  // Add quick action buttons
+
   return (
     <div className="outter-container">
       <div className="app-container">
@@ -62,17 +89,21 @@ function App() {
                 <div className="message">
                   <div className="message-content">{msg.text}</div>
 
-                  {msg.steps && (
-                    <SolutionSteps msg={msg} />
-                  )}
+                  {msg.steps && <SolutionSteps msg={msg} />}
 
-                  {msg.graph && (
-                    <MathGraph msg={msg} />
-                  )}
+                  {msg.graph && <MathGraph msg={msg} />}
+
+                  {/* {msg.matrixData && <MatrixDisplay matrix={msg.matrixData} />} */}
+
+                  {/* {msg.statisticsData && (
+                    <StatisticsDisplay stats={msg.statisticsData} />
+                  )} */}
                 </div>
               </div>
             ))}
           </div>
+
+          <QuickActions setUserInput={setUserInput} />
 
           <form onSubmit={sendMessage} className="input-container">
             <input
