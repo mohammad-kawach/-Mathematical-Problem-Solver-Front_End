@@ -1,8 +1,9 @@
-# React + Vite
+# This just a simple GUI for this repo: https://github.com/mohammad-kawach/Mathematical-Problem-Solver-API
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## installation :
+git clone https://github.com/mohammad-kawach/-Mathematical-Problem-Solver-Front_End
 
-Currently, two official plugins are available:
+npm install
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Testing:
+npm run dev
